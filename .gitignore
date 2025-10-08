@@ -1,0 +1,66 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Docker
+volumes/
+*.pid
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ollama specific
+.ollama/
+ollama_data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.code-workspace
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.cache/
+
+# Node (for potential web extensions)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Test outputs
+coverage/
+*.cover
+.pytest_cache/
+.tox/

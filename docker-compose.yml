@@ -1,0 +1,86 @@
+services:
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ollama-rtx5090:0.12.3
+    container_name: ollama-gpt-oss
+    runtime: nvidia
+    restart: unless-stopped
+
+    # Environment variables (loaded from .env file)
+    env_file:
+      - .env
+
+    # Port mapping
+    ports:
+      - "11434:11434"
+
+    # Volume mounts
+    volumes:
+      - ollama_models:/root/.ollama
+      - ./logs:/var/log/ollama
+
+    # Resource limits (optional - adjust based on your needs)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              device_ids: ['0']  # Use first GPU, change if needed
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+
+    # Port mapping
+    ports:
+      - "3000:8080"
+
+    # Environment variables
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_AUTH=false  # Set to true to enable authentication
+
+    # Volume mounts
+    volumes:
+      - open_webui_data:/app/backend/data
+
+    # Dependencies
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  ollama_models:
+    driver: local
+  open_webui_data:
+    driver: local
+
+networks:
+  default:
+    name: ollama-network
